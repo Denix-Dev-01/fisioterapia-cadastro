@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clínica FisioF - Agendamentos</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #3b82f6;
+      --secondary: #10b981;
+      --dark: #1e293b;
+      --light: #f8fafc;
+    }
+     
+    .sidebar {
+      transition: all 0.3s ease;
+    }
+    
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+      .sidebar.active {
+        transform: translateX(0);
+      }
+    }
+    
+    .Logo{
+      height:60px ;
+      width: 60px;
+
+    }
+    .perfil{
+     height: 40px;
+     width: 40px;
+    } 
+    .form-input {
+      transition: border-color 0.3s ease;
+    }
+    
+    .form-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(78, 106, 153, 0.2);
+    }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+  <div class="flex h-screen overflow-hidden">
+    <!-- Sidebar -->
+    <div class="sidebar bg-white w-64 md:w-72 shadow-lg fixed h-full z-10">
+      <div class="p-4 border-b border-gray-100">
+        <div class="flex items-center space-x-3">
+          <img class src="img/logo.jpg" alt="Logo" class="rounded-full" />
+          <h1 class="text-xl font-bold text-gray-800"></h1>
+        </div>
+      </div>
+      <nav class="mt-6">
+        <div class="px-4 py-2">
+          <p class="text-xs uppercase text-gray-500 font-semibold">Menu</p>
+        </div>
+        <div class="mt-2">
+          <a href="" class="flex items-center px-6 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+            <i class="fas fa-tachometer-alt mr-3"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="#pacientes" class="flex items-center px-6 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+            <i class="fas fa-user-injured mr-3"></i>
+            <span>Pacientes</span>
+          </a>
+          <a href="#agendamentos" class="flex items-center px-6 py-3 bg-blue-50 text-blue-600">
+            <i class="fas fa-calendar-alt mr-3"></i>
+            <span>Agendamentos</span>
+          </a>
+          <a href="#relatorios" class="flex items-center px-6 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+            <i class="fas fa-chart-bar mr-3"></i>
+            <span>Relatórios</span>
+          <a href="#configuracoes" class="flex items-center px-6 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+            <i class="fas fa-cog mr-3"></i>
+            <span>Configurações</span>
+          </a>
+        </div>
+      </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 overflow-auto ml-0 md:ml-64">
+      <header class="bg-white shadow-sm">
+        <div class="flex justify-between items-center px-6 py-4">
+          <div class="flex items-center">
+            <button id="menu-toggle" class="md:hidden text-gray-600">
+              <i class="fas fa-bars text-xl"></i>
+            </button>
+            <h2 class="text-lg font-semibold ml-4">Agendamentos</h2>
+          </div>
+          <div class="flex items-center space-x-4">
+            <div class="relative">
+              <input type="text" placeholder="Buscar..." class="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200">
+              <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+            </div>
+            <div class="relative">
+              <i class="fas fa-bell text-gray-600 text-xl cursor-pointer"></i>
+              <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">3</span>
+            </div>
+            <div class="flex items-center space-x-2">
+              <img class src="img/" alt="perfil" class="rounded-full" />
+              <span class="hidden md:inline">Dr. Flávio Andrade</span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main class="p-6">
+        <!-- Dashboard Overview -->
+        <div id="dashboard" class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div class="bg-blue rounded-lg shadow p-6">
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="text-gray-500">Pacientes</p>
+                <h3 class="text-2xl font-bold mt-2" id="total-pacientes">0</h3>
+              </div>
+              <div class="bg-blue-100 p-3 rounded-full text-blue-600">
+                <i class="fas fa-user-injured text-xl"></i>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="text-gray-500">Agendamentos Hoje</p>
+                <h3 class="text-2xl font-bold mt-2" id="agendamentos-hoje">0</h3>
+              </div>
+              <div class="bg-green-100 p-3 rounded-full text-green-600">
+                <i class="fas fa-calendar-day text-xl"></i>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex justify between items-start">
+              <div>
+                <p class="text-gray-500">Atendimentos Semana</p>
+                <h3 class="text-2xl font-bold mt-2" id="atendimentos-semana">0</h3>
+              </div>
+              <div class="bg-purple-100 p-3 rounded-full text-purple-600">
+                <i class="fas fa-calendar-week text-xl"></i>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="text-gray-500">Novos Pacientes</p>
+                <h3 class="text-2xl font-bold mt-2" id="novos-pacientes">0</h3>
+              </div>
+              <div class="bg-yellow-100 p-3 rounded-full text-yellow-600">
+                <i class="fas fa-user-plus text-xl"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Patient Registration -->
+        <div id="pacientes" class="bg-white rounded-lg shadow mb-8">
+          <div class="p-6 border-b border-gray-200">
+            <div class="flex justify-between items-center">
+              <h3 class="text-lg font-semibold">Cadastro de Pacientes</h3>
+              <button id="new-patient-btn" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                <i class="fas fa-plus mr-2"></i> Novo Paciente
+              </button>
+            </div>
+          </div>
+          <div class="p-6">
+            <form id="patient-form" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <input type="hidden" id="patient-id">
+              <div>
+                <label for="nome" class="block text-sm font-medium text-gray-700 mb-1">Nome Completo</label>
+                <input type="text" id="nome" class="w-full px-4 py-2 border rounded-lg form-input focus:outline-none focus:ring-2 focus:ring-blue-200" required>
+              </div>
+              <div>
+                <label for="cpf" class="block text-sm font-medium text-gray-700 mb-1">CPF</label>
+                <input type="text" id="cpf" class="w-full px-4 py-2 border rounded-lg form-input focus:outline-none focus:ring-2 focus:ring-blue-200" required>
+              </div>
+              <div>
+                <label for="data-nascimento" class="block text-sm font-medium text-gray-700 mb-1">Data de Nascimento</label>
+                <input type="date" id="data-nascimento" class="w-full px-4 py-2 border rounded-lg form-input focus:outline-none focus:ring-2 focus:ring-blue-200" required>
+              </div>
+              <div>
+                <label for="sexo" class="block text-sm font-medium text-gray-700 mb-1">Sexo</label>
+                <select id="sexo" class="w-full px-4 py-2 border rounded-lg form-input focus:outline-none focus:ring-2 focus:ring-blue-200" required>
+                  <option value="">Selecione</option>
+                  <option value="masculino">Masculino</option>
+                  <option value="feminino">Feminino</option>
+                </select>
+              </div>
+              <div>
+                <label for="telefone" class="block text-sm font-medium text-gray-700 mb-1">Telefone</label>
+                <input type="tel" id="telefone" class="w-full px-4 py-2 border rounded-lg form-input focus:outline-none focus:ring-2 focus:ring-blue-200" required>
+              </div>
+              <div>
+                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">E-mail</label>
+                <input type="email" id="email" class="w-full px-4 py-2 border rounded-lg form-input focus:outline-none focus:ring-2 focus:ring-blue-200">
+              </div>
+              <div class="md:col-span-2">
+                <label for="endereco" class="block text-sm font-medium text-gray-700 mb-1">Endereço</label>
+                <input type="text" id="endereco" class="w-full px-4 py-2 border rounded-lg form-input focus:outline-none focus:ring-2 focus:ring-blue-200" required>
+              </div>
+              <div class="md:col-span-2">
+                <label for="historico" class="block text-sm font-medium text-gray-700 mb-1">Histórico Médico</label>
+                <textarea id="historico" rows="3" class="w-full px-4 py-2 border rounded-lg form-input focus:outline-none focus:ring-2 focus:ring-blue-200"></textarea>
+              </div>
+              <div class="md:col-span-2 flex justify-end space-x-4">
+                <button type="button" id="cancel-patient-btn" class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100">Cancelar</button>
+                <button type="submit" id="save-patient-btn" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Salvar Paciente</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Patient List -->
+        <div class="bg-white rounded-lg shadow mb-8">
+          <div class="p-6 border-b border-gray-200">
+            <h3 class="text-lg font-semibold">Lista de Pacientes</h3>
+          </div>
+          <div class="p-6">
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CPF</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Telefone</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="patient-list" class="bg-white divide-y divide-gray-200">
+                  <!-- Pacientes serão carregados aqui dinamicamente -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Appointment Scheduling -->
+        <div id="agendamentos" class="bg-white rounded-lg shadow mb-8">
+          <div class="p-6 border-b border-gray-200">
+            <div class="flex justify-between items-center">
+              <h3 class="text-lg font-semibold">Agendamento de Consultas</h3>
+              <button id="new-appointment-btn" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
+                <i class="fas fa-plus mr-2"></i> Nova Consulta
+              </button>
+            </div>
+          </div>
+          <div class="p-6">
+            <form id="appointment-form" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <input type="hidden" id="appointment-id">
+              <div>
+                <label for="paciente-id" class="block text-sm font-medium text-gray-700 mb-1">Paciente</label>
+                <select id="paciente-id" class="w-full px-4 py-2 border rounded-lg form-input focus:outline-none focus:ring-2 focus:ring-blue-200" required>
+                  <option value="">Selecione um paciente</option>
+                  <!-- Opções de pacientes serão preenchidas dinamicamente -->
+                </select>
+              </div>
+              <div>
+                <label for="fisioterapeuta" class="block text-sm font-medium text-gray-700 mb-1">Fisioterapeuta</label>
+                <select id="fisioterapeuta" class="w-full px-4 py-2 border rounded-lg form-input focus:outline-none focus:ring-2 focus:ring-blue-200" required>
+                  <option value="">Selecione</option>
+                  <option value="Dr. Flávio Andrade">Dr. Flávio Andrade</option>
+                    </select>
+              </div>
+              <div>
+                <label for="data-consulta" class="block text-sm font-medium text-gray-700 mb-1">Data da Consulta</label>
+                <input type="date" id="data-consulta" class="w-full px-4 py-2 border rounded-lg form-input focus:outline-none focus:ring-2 focus:ring-blue-200" required>
+              </div>
+              <div>
+                <label for="hora-consulta" class="block text-sm font-medium text-gray-700 mb-1">Hora da Consulta</label>
+                <input type="time" id="hora-consulta" class="w-full px-4 py-2 border rounded-lg form-input focus:outline-none focus:ring-2 focus:ring-blue-200" required>
+              </div>
+              <div>
+                <label for="modalidade" class="block text-sm font-medium text-gray-700 mb-1">Modalidade de Tratamento</label>
+                <select id="modalidade" class="w-full px-4 py-2 border rounded-lg form-input focus:outline-none focus:ring-2 focus:ring-blue-200" required>
+                  <option value="">Selecione</option>
+                  <option value="Fisioterapia Ortopédica">Fisioterapia Ortopédica</option>
+                  <option value="Fisioterapia Neurológica">Fisioterapia Neurológica</option>
+                  <option value="Fisioterapia Respiratória">Fisioterapia Respiratória</option>
+                </select>
+              </div>
+              <div>
+                <label for="valor-consulta" class="block text-sm font-medium text-gray-700 mb-1">Valor da Consulta (R$)</label>
+                <input type="number" id="valor-consulta" step="0.01" class="w-full px-4 py-2 border rounded-lg form-input focus:outline-none focus:ring-2 focus:ring-blue-200" required>
+              </div>
+              <div class="md:col-span-2">
+                <label for="observacoes" class="block text-sm font-medium text-gray-700 mb-1">Observações</label>
+                <textarea id="observacoes" rows="3" class="w-full px-4 py-2 border rounded-lg form-input focus:outline-none focus:ring-2 focus:ring-blue-200"></textarea>
+              </div>
+              <div class="md:col-span-2 flex justify-end space-x-4">
+                <button type="button" id="cancel-appointment-btn" class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100">Cancelar</button>
+                <button type="submit" id="save-appointment-btn" class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">Agendar Consulta</button>
+              </div>
+            </form>
+          </div>
+        </div>     
+
+        <!-- Appointment List -->
+        <div class="bg-white rounded-lg shadow">
+          <div class="p-6 border-b border-gray-200">
+            <h3 class="text-lg font-semibold">Lista de Agendamentos</h3>
+          </div>
+          <div class="p-6">
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Paciente</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data/Hora</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fisioterapeuta</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Modalidade</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Detalhes</th>
+                  </tr>
+                </thead>
+                <tbody id="appointment-list" class="bg-white divide-y divide-gray-200">
+                  <!-- Agendamentos serão carregados aqui dinamicamente -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- JavaScript para a aplicação -->
+  <script>
+    // Módulo para gerenciamento de pacientes
+    const PatientModule = (() => {
+      const STORAGE_KEY = 'Fisio Flavio_pacientes';
+      
+      const getPatients = () => {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+      };
+
+      const savePatient = (patient) => {
+        const patients = getPatients();
+        const existingPatientIndex = patients.findIndex(p => p.id === patient.id);
+        
+        if (existingPatientIndex !== -1) {
+          // Atualiza paciente existente
+          patients[existingPatientIndex] = patient;
+        } else {
+          // Adiciona novo paciente com ID único
+          patient.id = Date.now().toString();
+          patients.push(patient);
+        }
+        
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(patients));
+        return patient;
+      };
+
+      const deletePatient = (id) => {
+        const patients = getPatients().filter(p => p.id !== id);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(patients));
+      };
+
+      return {
+        getPatients,
+        savePatient,
+        deletePatient
+      };
+    })();
+
+    // Módulo para gerenciamento de agendamentos
+    const AppointmentModule = (() => {
+      const STORAGE_KEY = 'Fisio Flavio_appointments';
+      
+      const getAppointments = () => {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+      };
+
+      const saveAppointment = (appointment) => {
+        const appointments = getAppointments();
+        const existingAppointmentIndex = appointments.findIndex(a => a.id === appointment.id);
+        
+        if (existingAppointmentIndex !== -1) {
+          // Atualiza agendamento existente
+          appointments[existingAppointmentIndex] = appointment;
+        } else {
+          // Adiciona novo agendamento com ID único
+          appointment.id = Date.now().toString();
+          appointments.push(appointment);
+        }
+        
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(appointments));
+        return appointment;
+      };
+
+      const deleteAppointment = (id) => {
+        const appointments = getAppointments().filter(a => a.id !== id);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(appointments));
+      };
+
+      return {
+        getAppointments,
+        saveAppointment,
+        deleteAppointment
+      };
+    })();
+
+    // Módulo para renderização da UI
+    const UIModule = (() => {
+      const renderPatientList = (patients) => {
+        const patientList = document.getElementById('patient-list');
+        patientList.innerHTML = '';
+        
+        patients.forEach(patient => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td class="px-6 py-4 whitespace-nowrap">${patient.nome}</td>
+            <td class="px-6 py-4 whitespace-nowrap">${patient.cpf}</td>
+            <td class="px-6 py-4 whitespace-nowrap">${patient.telefone}</td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <button onclick="editPatient('${patient.id}')" class="text-blue-600 hover:text-blue-900 mr-3">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button onclick="deletePatient('${patient.id}')" class="text-red-600 hover:text-red-900">
+                <i class="fas fa-trash"></i>
+              </button>
+            </td>
+          `;
+          patientList.appendChild(tr);
+        });
+        
+        document.getElementById('total-pacientes').textContent = patients.length;
+      };
+
+      const renderAppointmentList = (appointments) => {
+        const appointmentList = document.getElementById('appointment-list');
+        appointmentList.innerHTML = '';
+        
+        const today = new Date().toISOString().split('T')[0];
+        const appointmentsToday = appointments.filter(a => a.dataConsulta === today).length;
+        document.getElementById('agendamentos-hoje').textContent = appointmentsToday;
+        
+        appointments.forEach(appointment => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td class="px-6 py-4 whitespace-nowrap">${getPatientName(appointment.pacienteId)}</td>
+            <td class="px-6 py-4 whitespace-nowrap">${formatDate(appointment.dataConsulta)} ${appointment.horaConsulta}</td>
+            <td class="px-6 py-4 whitespace-nowrap">${appointment.fisioterapeuta}</td>
+            <td class="px-6 py-4 whitespace-nowrap">${appointment.modalidade}</td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <button onclick="editAppointment('${appointment.id}')" class="text-blue-600 hover:text-blue-900 mr-3">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button onclick="deleteAppointment('${appointment.id}')" class="text-red-600 hover:text-red-900">
+                <i class="fas fa-trash"></i>
+              </button>
+            </td>
+          `;
+          appointmentList.appendChild(tr);
+        });
+      };
+
+      const getPatientName = (patientId) => {
+        const patient = PatientModule.getPatients().find(p => p.id === patientId);
+        return patient ? patient.nome : 'Paciente não encontrado';
+      };
+
+      const formatDate = (dateString) => {
+        const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+        return new Date(dateString).toLocaleDateString('pt-BR', options);
+      };
+
+      const fillPatientSelect = () => {
+        const select = document.getElementById('paciente-id');
+        select.innerHTML = '<option value="">Selecione um paciente</option>';
+        
+        PatientModule.getPatients().forEach(patient => {
+          const option = document.createElement('option');
+          option.value = patient.id;
+          option.textContent = `${patient.nome} (${patient.cpf})`;
+          select.appendChild(option);
+        });
+      };
+
+      const clearPatientForm = () => {
+        document.getElementById('patient-id').value = '';
+        document.getElementById('patient-form').reset();
+      };
+
+      const clearAppointmentForm = () => {
+        document.getElementById('appointment-id').value = '';
+        document.getElementById('appointment-form').reset();
+      };
+
+      return {
+        renderPatientList,
+        renderAppointmentList,
+        fillPatientSelect,
+        clearPatientForm,
+        clearAppointmentForm
+      };
+    })();
+
+    // Funções globais para manipulação de pacientes
+    function loadPatients() {
+      const patients = PatientModule.getPatients();
+      UIModule.renderPatientList(patients);
+    }
+
+    function savePatient(e) {
+      e.preventDefault();
+      
+      const patient = {
+        id: document.getElementById('patient-id').value,
+        nome: document.getElementById('nome').value,
+        cpf: document.getElementById('cpf').value,
+        dataNascimento: document.getElementById('data-nascimento').value,
+        sexo: document.getElementById('sexo').value,
+        telefone: document.getElementById('telefone').value,
+        email: document.getElementById('email').value,
+        endereco: document.getElementById('endereco').value,
+        historico: document.getElementById('historico').value
+      };
+
+      PatientModule.savePatient(patient);
+      loadPatients();
+      UIModule.clearPatientForm();
+      UIModule.fillPatientSelect();
+    }
+
+    function editPatient(id) {
+      const patient = PatientModule.getPatients().find(p => p.id === id);
+      if (!patient) return;
+      
+      document.getElementById('patient-id').value = patient.id;
+      document.getElementById('nome').value = patient.nome;
+      document.getElementById('cpf').value = patient.cpf;
+      document.getElementById('data-nascimento').value = patient.dataNascimento;
+      document.getElementById('sexo').value = patient.sexo;
+      document.getElementById('telefone').value = patient.telefone;
+      document.getElementById('email').value = patient.email || '';
+      document.getElementById('endereco').value = patient.endereco;
+      document.getElementById('historico').value = patient.historico || '';
+      
+      document.getElementById('patient-form').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function deletePatient(id) {
+      if (confirm('Tem certeza que deseja excluir este paciente?')) {
+        PatientModule.deletePatient(id);
+        loadPatients();
+        UIModule.fillPatientSelect();
+      }
+    }
+
+    function newPatient() {
+      UIModule.clearPatientForm();
+      document.getElementById('patient-form').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Funções globais para manipulação de agendamentos
+    function loadAppointments() {
+      const appointments = AppointmentModule.getAppointments();
+      UIModule.renderAppointmentList(appointments);
+    }
+
+    function saveAppointment(e) {
+      e.preventDefault();
+      
+      const appointment = {
+        id: document.getElementById('appointment-id').value,
+        pacienteId: document.getElementById('paciente-id').value,
+        fisioterapeuta: document.getElementById('fisioterapeuta').value,
+        dataConsulta: document.getElementById('data-consulta').value,
+        horaConsulta: document.getElementById('hora-consulta').value,
+        modalidade: document.getElementById('modalidade').value,
+        valorConsulta: document.getElementById('valor-consulta').value,
+        observacoes: document.getElementById('observacoes').value
+      };
+
+      AppointmentModule.saveAppointment(appointment);
+      loadAppointments();
+      UIModule.clearAppointmentForm();
+    }
+
+    function editAppointment(id) {
+      const appointment = AppointmentModule.getAppointments().find(a => a.id === id);
+      if (!appointment) return;
+      
+      document.getElementById('appointment-id').value = appointment.id;
+      document.getElementById('paciente-id').value = appointment.pacienteId;
+      document.getElementById('fisioterapeuta').value = appointment.fisioterapeuta;
+      document.getElementById('data-consulta').value = appointment.dataConsulta;
+      document.getElementById('hora-consulta').value = appointment.horaConsulta;
+      document.getElementById('modalidade').value = appointment.modalidade;
+      document.getElementById('valor-consulta').value = appointment.valorConsulta;
+      document.getElementById('observacoes').value = appointment.observacoes || '';
+      
+      document.getElementById('appointment-form').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function deleteAppointment(id) {
+      if (confirm('Tem certeza que deseja cancelar este agendamento?')) {
+        AppointmentModule.deleteAppointment(id);
+        loadAppointments();
+      }
+    }
+
+    function newAppointment() {
+      UIModule.clearAppointmentForm();
+      document.getElementById('appointment-form').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Função que adiciona dados de exemplo ao abrir o arquivo (apenas se estiver vazio)
+    function seedSampleData() {
+      // Só roda se não houver pacientes salvos
+      if (PatientModule.getPatients().length === 0) {
+        PatientModule.savePatient({
+          // id não fornecido: savePatient gera um id automaticamente
+          nome: 'João Silva',
+          cpf: '123.456.789-00',
+          dataNascimento: '1980-01-01',
+          sexo: 'masculino',
+          telefone: '(11) 99999-0000',
+          email: 'joao@example.com',
+          endereco: 'Rua A, 123',
+          historico: 'Sem histórico relevante.'
+        });
+      }
+
+      // Só roda se não houver agendamentos salvos
+      if (AppointmentModule.getAppointments().length === 0) {
+        const pacientes = PatientModule.getPatients();
+        if (pacientes.length > 0) {
+          AppointmentModule.saveAppointment({
+            pacienteId: pacientes[0].id,
+            fisioterapeuta: 'Dr. Flávio Andrade',
+            dataConsulta: new Date().toISOString().split('T')[0], // hoje
+            horaConsulta: '09:00',
+            modalidade: 'Fisioterapia Ortopédica',
+            valorConsulta: '100.00',
+            observacoes: 'Consulta inicial (gerada automaticamente).'
+          });
+        }
+      }
+    }
+
+    // Configuração de eventos
+    document.addEventListener('DOMContentLoaded', () => {
+      // Eventos do formulário de pacientes
+      document.getElementById('patient-form').addEventListener('submit', savePatient);
+      document.getElementById('new-patient-btn').addEventListener('click', newPatient);
+      document.getElementById('cancel-patient-btn').addEventListener('click', () => {
+        UIModule.clearPatientForm();
+      });
+
+      // Eventos do formulário de agendamentos
+      document.getElementById('appointment-form').addEventListener('submit', saveAppointment);
+      document.getElementById('new-appointment-btn').addEventListener('click', newAppointment);
+      document.getElementById('cancel-appointment-btn').addEventListener('click', () => {
+        UIModule.clearAppointmentForm();
+      });
+
+      // Menu mobile toggle
+      document.getElementById('menu-toggle').addEventListener('click', () => {
+        document.querySelector('.sidebar').classList.toggle('active');
+      });
+
+      // Carrega dados iniciais
+      // 1) seedSampleData garante que a interface tenha algo para mostrar na primeira abertura
+      seedSampleData();
+
+      // 2) carrega e renderiza dados
+      loadPatients();
+      loadAppointments();
+      UIModule.fillPatientSelect();
+      
+      // Atualiza estatísticas
+      updateStats();
+    });
+
+    // Atualiza estatísticas do dashboard
+    function updateStats() {
+      const patients = PatientModule.getPatients();
+      const today = new Date().toISOString().split('T')[0];
+      const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      
+      const appointments = AppointmentModule.getAppointments();
+      const appointmentsToday = appointments.filter(a => a.dataConsulta === today).length;
+      const appointmentsWeek = appointments.filter(a => a.dataConsulta >= weekAgo).length;
+      
+      const newPatientsWeek = patients.filter(p => {
+        const patientDate = new Date(p.id).toISOString().split('T')[0];
+        return patientDate >= weekAgo;
+      }).length;
+      
+      document.getElementById('total-pacientes').textContent = patients.length;
+      document.getElementById('agendamentos-hoje').textContent = appointmentsToday;
+      document.getElementById('atendimentos-semana').textContent = appointmentsWeek;
+      document.getElementById('novos-pacientes').textContent = newPatientsWeek;
+    }
+  </script>
+<!-- Code injected by live-server -->
+<script>
+	// <![CDATA[  <-- For SVG support
+	if ('WebSocket' in window) {
+		(function () {
+			function refreshCSS() {
+				var sheets = [].slice.call(document.getElementsByTagName("link"));
+				var head = document.getElementsByTagName("head")[0];
+				for (var i = 0; i < sheets.length; ++i) {
+					var elem = sheets[i];
+					var parent = elem.parentElement || head;
+					parent.removeChild(elem);
+					var rel = elem.rel;
+					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+					}
+					parent.appendChild(elem);
+				}
+			}
+			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+			var address = protocol + window.location.host + window.location.pathname + '/ws';
+			var socket = new WebSocket(address);
+			socket.onmessage = function (msg) {
+				if (msg.data == 'reload') window.location.reload();
+				else if (msg.data == 'refreshcss') refreshCSS();
+			};
+			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+				console.log('Live reload enabled.');
+				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+			}
+		})();
+	}
+	else {
+		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+	}
+	// ]]>
+</script>
+</body>
+</html>
